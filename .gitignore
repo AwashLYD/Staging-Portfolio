@@ -1,0 +1,8 @@
+# Ignore all video files
+*.mp4
+*.mov
+*.webm
+*.m4v
+
+# macOS
+.DS_Store
