@@ -1,0 +1,158 @@
+<img width="1536" height="1024" alt="pipline fail" src="https://github.com/user-attachments/assets/d7ebad89-75e4-48d0-a2f4-5461d0eee58c" />
+
+```mermaid
+flowchart TD
+    A[End Users<br/>Browser / Internet Traffic]
+    B[Cloudflare<br/>DNS / HTTPS / WAF]
+    C[Nginx<br/>Reverse Proxy]
+
+    A --> B --> C
+
+    C --> D[Staging Container<br/>portfolio-app<br/>Port 8080]
+    C --> E[Production Container<br/>portfolio-staging<br/>Port 8082]
+
+    D --> F[CI/CD Pipeline]
+    E --> F
+
+    F --> G[Docker]
+
+    G --> H[Monitoring<br/>Prometheus / Grafana]
+    G --> I[Security<br/>Trivy / Fail2Ban / SSH / WAF]
+```
+
+A production-grade, self-managed DevSecOps platform built from scratch on a VPS, designed to simulate real-world enterprise infrastructure, CI/CD workflows, security integration, and observability.
+
+Overview
+
+This project demonstrates a complete end-to-end DevSecOps lifecycle, evolving from a basic portfolio website into a multi-environment, containerized, secure, and observable system.
+
+**It reflects modern industry practices across:**
+Infrastructure engineering
+CI/CD automation
+Containerization
+Security integration
+Monitoring & observability
+
+**Architecture**
+High-level system flow:
+
+User
+ ↓
+Cloudflare (DNS / SSL / Security)
+ ↓
+Nginx Reverse Proxy (VPS)
+ ↓
+Docker Containers
+ ├── Portfolio (Production)
+ ├── Portfolio (Staging)
+ ├── Jenkins (CI/CD)
+ └── Grafana (Monitoring)
+
+**Infrastructure**
+Rocky Linux (RHEL-based) and Ubuntu 
+VPS (cloud-hosted)
+Nginx (reverse proxy + SSL termination)
+Cloudflare (DNS, HTTPS, edge security)
+
+**Containerization**
+Docker (multi-container setup)
+
+**CI/CD**
+Jenkins (pipeline automation)
+GitHub (source of truth)
+
+**Security (DevSecOps)**
+Trivy (container vulnerability scanning)
+SonarQube (on-demand code analysis)
+OWASP ZAP *(planned for DAST)*
+
+**Monitoring & Observability**
+Node Exporter
+Prometheus
+Grafana
+
+**Features**
+Multi-environment setup (**Production + Staging**)
+Fully containerized deployment
+Automated CI/CD pipeline (Jenkins)
+Integrated security scanning (Trivy)
+Reverse proxy with HTTPS (Cloudflare + Nginx)
+Monitoring stack (Prometheus + Grafana)
+System hardening (firewall, SSH, Fail2Ban)
+Domain-based routing with subdomains
+
+
+**CI/CD Pipeline**
+
+Pipeline flow:
+
+1. Code pushed to GitHub
+2. Jenkins pipeline triggered
+3. Docker image built
+4. Security scan using Trivy
+5. Old container removed
+6. New container deployed
+   
+
+groovy
+pipeline {
+  agent any
+  stages {
+    stage('Clone Repo') {
+      steps {
+        git branch: 'main', url: '<repo-url>'
+      }
+    }
+    stage('Build') {
+      steps {
+        sh 'docker build -t portfolio-app .'
+      }
+    }
+    stage('Deploy') {
+      steps {
+        sh '''
+        docker rm -f portfolio || true
+        docker run -d -p 8080:80 portfolio-app
+        '''
+      }
+    }
+  }
+}
+
+**Environments**
+
+| Environment | Port | Purpose         |
+| ----------- | ---- | --------------- |
+| Production  | **** | Live deployment |
+| Staging     | **** | Testing changes |
+| Jenkins     | *** | CI/CD           |
+| Grafana     | **** | Monitoring      |
+
+
+
+**Security Implementation**
+ Container vulnerability scanning via **Trivy**
+ HTTPS enforced via **Cloudflare + Origin Certificates**
+ Nginx reverse proxy with secure headers
+ Basic authentication for admin services
+ 
+**System hardening**
+Firewall rules
+Fail2Ban
+SSH security practices
+
+**Monitoring Stack**
+Node Exporter → system metric
+Prometheus → metrics collection
+Grafana → dashboards & visualization
+
+
+**Documentation**
+
+Full detailed documentation (with commands, diagrams, and troubleshooting):
+
+Screenshot detail available on ScreenshotFolder 
+https://www.linkedin.com/posts/activity-7424926449561686018-tUq3?utm_source=share&utm_medium=member_desktop&rcm=ACoAACY74gkBUtwskDdA_IAvKNLeRaESUXIyFis
+https://www.linkedin.com/posts/activity-7412107817433812992-Q2Bd?utm_source=share&utm_medium=member_desktop&rcm=ACoAACY74gkBUtwskDdA_IAvKNLeRaESUXIyFis
+youtube link - phase 1 ( shared ) phase 2 ( ubuntu ) phase 3 ( rocky linux )
+documenation - pdf for all the code integration for all bundled
